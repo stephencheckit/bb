@@ -86,7 +86,7 @@ export default function HomePage({ beaches }: HomePageProps) {
               <div className="text-3xl">🌙</div>
               <div className="flex-1">
                 <p className={`font-semibold ${timeTheme.period === 'night' ? 'text-white' : 'text-slate-900'}`}>
-                  It's nighttime—showing tomorrow's beach forecast
+                  It's nighttime—not the ideal beach day!
                 </p>
                 <p className={`text-sm mt-1 ${timeTheme.period === 'night' ? 'text-slate-300' : 'text-slate-600'}`}>
                   🌅 Sunrise tomorrow at {formatTime(new Date(currentConditions.sunrise))} · Beach times shown below are for tomorrow!
@@ -125,15 +125,28 @@ export default function HomePage({ beaches }: HomePageProps) {
         {/* Main Content */}
         {!isLoading && !error && displayWindow && (
           <div className="mt-8 space-y-8">
-            {/* Hero: Best Window - Only show if it's a current "Go Now" opportunity */}
-            {goNowWindow && goNowWindow.score > 30 && (
-              <section>
-                <h2 className={`mb-4 text-2xl font-bold ${timeTheme.period === 'night' ? 'text-white' : 'text-slate-900'}`}>
-                  Go Now! 🌊
-                </h2>
-                <BeachScoreCard window={displayWindow} showDetails />
-              </section>
-            )}
+            {/* Hero: Current/Best Window Score */}
+            <section>
+              <h2 className={`mb-4 text-2xl font-bold ${timeTheme.period === 'night' ? 'text-white' : 'text-slate-900'}`}>
+                {goNowWindow && goNowWindow.score > 30 
+                  ? 'Go Now! 🌊' 
+                  : timeTheme.period === 'night' || timeTheme.period === 'dusk'
+                  ? 'Right Now 🌙'
+                  : 'Current Conditions'}
+              </h2>
+              <BeachScoreCard 
+                window={goNowWindow || {
+                  ...displayWindow,
+                  conditions: currentConditions || displayWindow.conditions,
+                  score: currentConditions && (timeTheme.period === 'night' || timeTheme.period === 'dusk') ? 30 : displayWindow.score,
+                  badges: (timeTheme.period === 'night' || timeTheme.period === 'dusk') ? [
+                    { id: 'nighttime', label: '🌙 Nighttime', icon: '🌙', type: 'negative' },
+                    ...(currentConditions?.badges || displayWindow.badges).filter(b => b.id !== 'nighttime')
+                  ] : (currentConditions?.badges || displayWindow.badges)
+                }} 
+                showDetails 
+              />
+            </section>
 
             {/* Current Conditions */}
             {currentConditions && (
