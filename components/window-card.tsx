@@ -28,11 +28,8 @@ export function WindowCard({ window, beachId }: WindowCardProps) {
   // Get day of week label
   const now = new Date();
   const isToday = startTime.toDateString() === now.toDateString();
-  const tomorrow = new Date(now);
-  tomorrow.setDate(tomorrow.getDate() + 1);
-  const isTomorrow = startTime.toDateString() === tomorrow.toDateString();
   
-  const dayLabel = isToday ? 'Today' : isTomorrow ? 'Tomorrow' : startTime.toLocaleDateString('en-US', { weekday: 'long' });
+  const dayLabel = isToday ? 'Today' : startTime.toLocaleDateString('en-US', { weekday: 'long' });
 
   return (
     <div

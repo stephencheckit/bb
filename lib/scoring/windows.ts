@@ -75,43 +75,36 @@ export async function generateWindows(
     windows.push(scored.window);
   }
 
-  // Separate daytime and nighttime windows
-  const daytimeWindows = windows.filter(w => w.score > 30); // Not nighttime
-  const nighttimeWindows = windows.filter(w => w.score <= 30); // Nighttime
+  // Sort all windows chronologically (soonest to latest)
+  windows.sort((a, b) => a.startTime.getTime() - b.startTime.getTime());
 
-  // Sort daytime windows by score (best first)
-  daytimeWindows.sort((a, b) => b.score - a.score);
-  
-  // Sort nighttime windows by time (chronologically)
-  nighttimeWindows.sort((a, b) => a.startTime.getTime() - b.startTime.getTime());
-
-  // Combine: prioritize daytime windows, then add nighttime if needed
-  const sortedWindows = [...daytimeWindows, ...nighttimeWindows];
-
-  // Mark "Go Now" window (best daytime window that includes current time)
+  // Mark "Go Now" window (current window with good score)
   const currentTime = now.getTime();
-  const goNowWindow = daytimeWindows.find((w) => {
+  const goNowWindow = windows.find((w) => {
     const start = w.startTime.getTime();
     const end = w.endTime.getTime();
-    return currentTime >= start && currentTime <= end;
+    const isCurrentWindow = currentTime >= start && currentTime <= end;
+    const isGoodScore = w.score > 30; // Not nighttime
+    return isCurrentWindow && isGoodScore;
   });
 
   if (goNowWindow) {
     goNowWindow.isGoNow = true;
-  } else if (daytimeWindows.length > 0) {
-    // If no daytime window contains current time, mark the best daytime window
-    // that starts within the next hour as "Go Now"
+  } else {
+    // If no window contains current time, mark the best upcoming window within next hour
     const nextHour = currentTime + 60 * 60 * 1000;
-    const upcomingWindow = daytimeWindows.find(
-      (w) => w.startTime.getTime() >= currentTime && w.startTime.getTime() <= nextHour
+    const upcomingWindow = windows.find(
+      (w) => w.startTime.getTime() >= currentTime && 
+             w.startTime.getTime() <= nextHour &&
+             w.score >= 60
     );
     
-    if (upcomingWindow && upcomingWindow.score >= 60) {
+    if (upcomingWindow) {
       upcomingWindow.isGoNow = true;
     }
   }
 
-  return sortedWindows;
+  return windows;
 }
 
 /**

@@ -71,7 +71,7 @@ export default function HomePage({ beaches }: HomePageProps) {
                 Beach Buddy 🏖️
               </h1>
               <p className={`mt-1 text-sm ${timeTheme.period === 'night' ? 'text-slate-300' : 'text-slate-600'}`}>
-                Your smart beach day concierge · {timeTheme.text}
+                Your smart beach day concierge
               </p>
             </div>
           </div>
