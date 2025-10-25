@@ -68,7 +68,7 @@ export default function HomePage({ beaches }: HomePageProps) {
           <div className="flex items-center justify-between">
             <div>
               <h1 className={`text-3xl font-bold tracking-tight ${timeTheme.period === 'night' ? 'text-white' : 'text-slate-900'}`}>
-                Beach Buddy {timeTheme.emoji}
+                Beach Buddy 🏖️
               </h1>
               <p className={`mt-1 text-sm ${timeTheme.period === 'night' ? 'text-slate-300' : 'text-slate-600'}`}>
                 Your smart beach day concierge · {timeTheme.text}
@@ -253,7 +253,7 @@ export default function HomePage({ beaches }: HomePageProps) {
               <section>
                 <h2 className={`mb-4 text-xl font-bold ${timeTheme.period === 'night' ? 'text-white' : 'text-slate-900'}`}>
                   {timeTheme.period === 'night' || timeTheme.period === 'dusk' 
-                    ? 'Tomorrow\'s Beach Times' 
+                    ? 'Upcoming' 
                     : goNowWindow && goNowWindow.score > 30 
                     ? 'Other Times Today' 
                     : 'Beach Times Today'}
@@ -302,7 +302,7 @@ export default function HomePage({ beaches }: HomePageProps) {
       {/* Footer */}
       <footer className={`mt-16 border-t py-8 ${timeTheme.period === 'night' ? 'border-slate-700 bg-slate-800' : 'border-slate-200 bg-white'}`}>
         <div className={`mx-auto max-w-4xl px-4 text-center text-sm ${timeTheme.period === 'night' ? 'text-slate-400' : 'text-slate-500'}`}>
-          <p>Beach Buddy · Palm Harbor, FL · Made with {timeTheme.emoji}</p>
+          <p>Beach Buddy 🏖️ · Palm Harbor, FL · Made with ☀️</p>
         </div>
       </footer>
     </div>

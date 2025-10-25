@@ -24,6 +24,15 @@ export function WindowCard({ window, beachId }: WindowCardProps) {
   // Convert to Date objects if they're strings (from API serialization)
   const startTime = new Date(window.startTime);
   const endTime = new Date(window.endTime);
+  
+  // Get day of week label
+  const now = new Date();
+  const isToday = startTime.toDateString() === now.toDateString();
+  const tomorrow = new Date(now);
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  const isTomorrow = startTime.toDateString() === tomorrow.toDateString();
+  
+  const dayLabel = isToday ? 'Today' : isTomorrow ? 'Tomorrow' : startTime.toLocaleDateString('en-US', { weekday: 'long' });
 
   return (
     <div
@@ -32,6 +41,9 @@ export function WindowCard({ window, beachId }: WindowCardProps) {
       {/* Header */}
       <div className="flex items-start justify-between">
         <div>
+          <p className="text-sm font-semibold text-sky-600">
+            {dayLabel}
+          </p>
           <p className="text-lg font-bold text-slate-900">
             {formatTimeRange(startTime, endTime)}
           </p>
