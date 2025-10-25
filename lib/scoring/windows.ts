@@ -52,10 +52,22 @@ export async function generateWindows(
       const sunset = new Date(snapshot.sunset);
       
       // A window is nighttime if its midpoint is outside daylight hours
-      // Compare only the time portion for the same day
       const isBeforeSunrise = windowMidpoint < sunrise;
       const isAfterSunset = windowMidpoint > sunset;
       const isNighttime = isBeforeSunrise || isAfterSunset;
+      
+      // Debug logging
+      if (windowStart.getHours() < 7) {
+        console.log('🌙 Night check:', {
+          window: windowStart.toLocaleString(),
+          midpoint: windowMidpoint.toLocaleString(),
+          sunrise: sunrise.toLocaleString(),
+          sunset: sunset.toLocaleString(),
+          isBeforeSunrise,
+          isAfterSunset,
+          isNighttime
+        });
+      }
       
       if (isNighttime) {
         scored.window.badges.push({
