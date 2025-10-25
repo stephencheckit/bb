@@ -48,12 +48,18 @@ export function BestDayCard({ day, beachId }: BestDayCardProps) {
     day.weatherCode.startsWith('11') ? '⛈️' :
     day.weatherCode.startsWith('13') ? '❄️' : '🌤️';
 
-  // Format date
+  // Format date and create a window for the best day (10 AM - 1 PM)
   const dateObj = new Date(day.date);
   const formattedDate = dateObj.toLocaleDateString('en-US', { 
     month: 'short', 
     day: 'numeric' 
   });
+
+  // Create a 3-hour window starting at 10 AM on the best day
+  const windowStart = new Date(dateObj);
+  windowStart.setHours(10, 0, 0, 0);
+  const windowEnd = new Date(windowStart);
+  windowEnd.setHours(13, 0, 0, 0);
 
   return (
     <div className="rounded-2xl bg-white p-6 shadow-lg">
@@ -118,7 +124,7 @@ export function BestDayCard({ day, beachId }: BestDayCardProps) {
 
       {/* Pack List Button */}
       <Link
-        href={`/plan?beachId=${beachId}&date=${dateObj.toISOString()}`}
+        href={`/plan?beachId=${beachId}&windowStart=${windowStart.toISOString()}&windowEnd=${windowEnd.toISOString()}`}
         className="block w-full rounded-full bg-gradient-to-r from-sky-500 to-blue-600 py-3 text-center font-bold text-white shadow-md transition-all hover:shadow-lg hover:from-sky-600 hover:to-blue-700"
       >
         📋 View Pack List & Details
