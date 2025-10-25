@@ -9,6 +9,7 @@ import { BeachScoreCard } from '@/components/beach-score-card';
 import { WindowCard } from '@/components/window-card';
 import { ConditionTile } from '@/components/condition-tile';
 import { WeeklyForecast } from '@/components/weekly-forecast';
+import { BestDayCard } from '@/components/best-day-card';
 import { loadFavorites } from '@/lib/utils/storage';
 import { formatTemp, formatUV, formatWindSpeed, formatTideHeight, formatTime } from '@/lib/utils/formatters';
 import { getUVSafetyLevel } from '@/lib/services/uv.service';
@@ -261,6 +262,23 @@ export default function HomePage({ beaches }: HomePageProps) {
 
           </div>
         )}
+
+        {/* Best Upcoming Beach Day */}
+        {!isLoading && !error && forecastData?.forecast && (() => {
+          // Find the best day (highest score)
+          const bestDay = forecastData.forecast.reduce((best: any, current: any) => 
+            current.score > best.score ? current : best
+          );
+          
+          return bestDay.score >= 60 ? (
+            <section className="mt-8">
+              <BestDayCard 
+                day={bestDay}
+                beachId={selectedBeachId}
+              />
+            </section>
+          ) : null;
+        })()}
 
         {/* Weekly Forecast */}
         {!isLoading && !error && forecastData?.forecast && (
