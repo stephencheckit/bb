@@ -47,15 +47,15 @@ export async function generateWindows(
     // Check if window is during nighttime (before sunrise or after sunset)
     if (snapshot.sunrise && snapshot.sunset) {
       const windowStart = new Date(snapshot.timestamp);
-      const windowEnd = new Date(windowStart.getTime() + opts.duration * 60 * 60 * 1000);
+      const windowMidpoint = new Date(windowStart.getTime() + (opts.duration * 60 * 60 * 1000) / 2);
       const sunrise = new Date(snapshot.sunrise);
       const sunset = new Date(snapshot.sunset);
       
-      // Check if window overlaps with nighttime
-      // It's nighttime if: window starts after sunset OR window ends before sunrise
-      const startsAfterSunset = windowStart >= sunset;
-      const endsBeforeSunrise = windowEnd <= sunrise;
-      const isNighttime = startsAfterSunset || endsBeforeSunrise;
+      // A window is nighttime if its midpoint is outside daylight hours
+      // Compare only the time portion for the same day
+      const isBeforeSunrise = windowMidpoint < sunrise;
+      const isAfterSunset = windowMidpoint > sunset;
+      const isNighttime = isBeforeSunrise || isAfterSunset;
       
       if (isNighttime) {
         scored.window.badges.push({
