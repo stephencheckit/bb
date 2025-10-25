@@ -140,8 +140,8 @@ export default function HomePage({ beaches }: HomePageProps) {
                   conditions: currentConditions || displayWindow.conditions,
                   score: currentConditions && (timeTheme.period === 'night' || timeTheme.period === 'dusk') ? 30 : displayWindow.score,
                   badges: (timeTheme.period === 'night' || timeTheme.period === 'dusk') ? [
-                    { id: 'nighttime', label: '🌙 Nighttime', icon: '🌙', type: 'negative' },
-                    ...(currentConditions?.badges || displayWindow.badges).filter(b => b.id !== 'nighttime')
+                    { id: 'nighttime', label: '🌙 Nighttime', icon: '🌙', type: 'negative' as const },
+                    ...(currentConditions?.badges || displayWindow.badges).filter((b: { id: string }) => b.id !== 'nighttime')
                   ] : (currentConditions?.badges || displayWindow.badges)
                 }} 
                 showDetails 
