@@ -269,6 +269,34 @@ npm start
 
 ## 🚢 Deployment Log
 
+### October 25, 2025 (11:15 PM) - Expanded Nearby Places 🗺️
+**Status**: ✅ DEPLOYED TO GITHUB
+
+#### What Was Added
+- ✅ Expanded places search to include grocery stores (supermarket)
+- ✅ Added liquor stores (alcohol, beverages, wine)
+- ✅ Added beach shops (sports, beach, surf shops)
+- ✅ Added ice cream shops to cafe category
+- ✅ Increased search radius from 1.5km to 2km for better coverage
+- ✅ Now shows up to 20 places (previously 10)
+- ✅ Updated UI with new icons: 🛒 (grocery), 🍷 (liquor), 🏄 (beach shop)
+- ✅ Enhanced section title: "Nearby Essentials" with helpful description
+
+#### Files Modified
+- `lib/models/beach.ts` (expanded NearbyPlace type)
+- `lib/services/places.service.ts` (comprehensive Overpass API query)
+- `components/places-list.tsx` (new type icons and labels)
+- `app/plan/page.tsx` (updated heading and description)
+- `app/api/plan/route.ts` (increased to 20 places)
+
+#### User Experience Improvements
+- One-stop view for all beach day essentials
+- Better coverage with 2km search radius
+- Categorized icons for easy scanning
+- More practical for real beach trips (can grab drinks, snacks, or forgot items)
+
+---
+
 ### October 25, 2025 (11:00 PM) - Best Upcoming Beach Day Feature 🏖️
 **Status**: ✅ DEPLOYED TO GITHUB
 
