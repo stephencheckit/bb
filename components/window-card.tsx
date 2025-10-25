@@ -21,6 +21,10 @@ export function WindowCard({ window, beachId }: WindowCardProps) {
 
   const borderClass = window.isGoNow ? 'ring-4 ring-sky-400' : '';
 
+  // Convert to Date objects if they're strings (from API serialization)
+  const startTime = new Date(window.startTime);
+  const endTime = new Date(window.endTime);
+
   return (
     <div
       className={`rounded-2xl bg-white p-5 shadow-md transition-all hover:shadow-lg ${borderClass}`}
@@ -29,7 +33,7 @@ export function WindowCard({ window, beachId }: WindowCardProps) {
       <div className="flex items-start justify-between">
         <div>
           <p className="text-lg font-bold text-slate-900">
-            {formatTimeRange(window.startTime, window.endTime)}
+            {formatTimeRange(startTime, endTime)}
           </p>
           {window.isGoNow && (
             <span className="mt-1 inline-block rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-semibold text-emerald-700">
@@ -66,7 +70,7 @@ export function WindowCard({ window, beachId }: WindowCardProps) {
 
       {/* CTA Button */}
       <Link
-        href={`/plan?beachId=${beachId}&windowStart=${window.startTime.toISOString()}&windowEnd=${window.endTime.toISOString()}`}
+        href={`/plan?beachId=${beachId}&windowStart=${startTime.toISOString()}&windowEnd=${endTime.toISOString()}`}
         className="mt-4 block w-full rounded-full bg-sky-500 py-2.5 text-center font-semibold text-white transition-colors hover:bg-sky-600"
       >
         Plan This Trip

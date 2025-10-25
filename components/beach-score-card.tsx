@@ -49,7 +49,7 @@ export function BeachScoreCard({ window, showDetails = false }: BeachScoreCardPr
       {/* Badges */}
       {window.badges.length > 0 && (
         <div className="mt-4 flex flex-wrap gap-2">
-          {window.badges.map((badge) => {
+          {window.badges.map((badge, index) => {
             const badgeColorClasses = {
               positive: 'bg-emerald-50 text-emerald-700 ring-emerald-200',
               neutral: 'bg-blue-50 text-blue-700 ring-blue-200',
@@ -59,7 +59,7 @@ export function BeachScoreCard({ window, showDetails = false }: BeachScoreCardPr
 
             return (
               <span
-                key={badge.id}
+                key={badge.id || `badge-${index}`}
                 className={`inline-flex items-center gap-1 rounded-full px-3 py-1 text-sm font-medium ring-1 ${
                   badgeColorClasses[badge.type]
                 }`}

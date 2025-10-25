@@ -8,9 +8,11 @@ import { BeachSelector } from '@/components/beach-selector';
 import { BeachScoreCard } from '@/components/beach-score-card';
 import { WindowCard } from '@/components/window-card';
 import { ConditionTile } from '@/components/condition-tile';
+import { WeeklyForecast } from '@/components/weekly-forecast';
 import { loadFavorites } from '@/lib/utils/storage';
-import { formatTemp, formatUV, formatWindSpeed, formatTideHeight } from '@/lib/utils/formatters';
+import { formatTemp, formatUV, formatWindSpeed, formatTideHeight, formatTime } from '@/lib/utils/formatters';
 import { getUVSafetyLevel } from '@/lib/services/uv.service';
+import { getTimeOfDayTheme } from '@/lib/utils/time-of-day';
 
 const fetcher = (url: string) => fetch(url).then((r) => r.json());
 
@@ -28,6 +30,9 @@ export default function HomePage({ beaches }: HomePageProps) {
     return [];
   });
 
+  // Get time of day theme
+  const timeTheme = getTimeOfDayTheme();
+
   // Fetch windows for selected beach
   const { data, error, isLoading } = useSWR(
     selectedBeachId ? `/api/windows?beachId=${selectedBeachId}` : null,
@@ -35,26 +40,62 @@ export default function HomePage({ beaches }: HomePageProps) {
     { refreshInterval: 900000 } // Refresh every 15 minutes
   );
 
+  // Fetch current conditions separately
+  const { data: currentData } = useSWR(
+    selectedBeachId ? `/api/conditions?beachId=${selectedBeachId}` : null,
+    fetcher,
+    { refreshInterval: 900000 } // Refresh every 15 minutes
+  );
+
+  // Fetch weekly forecast
+  const { data: forecastData } = useSWR(
+    selectedBeachId ? `/api/forecast?beachId=${selectedBeachId}` : null,
+    fetcher,
+    { refreshInterval: 3600000 } // Refresh every hour
+  );
+
   const windows: Window[] = data?.windows || [];
   const bestWindow = windows.length > 0 ? windows[0] : null;
   const goNowWindow = windows.find((w: Window) => w.isGoNow);
   const displayWindow = goNowWindow || bestWindow;
+  const currentConditions = currentData?.conditions;
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-sky-50 to-blue-50">
+    <div className={`min-h-screen bg-gradient-to-br ${timeTheme.background} transition-colors duration-1000`}>
       {/* Header */}
-      <header className="bg-white shadow-sm">
+      <header className={`shadow-sm ${timeTheme.period === 'night' ? 'bg-slate-800' : 'bg-white'}`}>
         <div className="mx-auto max-w-4xl px-4 py-6">
-          <h1 className="text-3xl font-bold tracking-tight text-slate-900">
-            Beach Buddy 🏖️
-          </h1>
-          <p className="mt-1 text-sm text-slate-600">
-            Your smart beach day concierge
-          </p>
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className={`text-3xl font-bold tracking-tight ${timeTheme.period === 'night' ? 'text-white' : 'text-slate-900'}`}>
+                Beach Buddy {timeTheme.emoji}
+              </h1>
+              <p className={`mt-1 text-sm ${timeTheme.period === 'night' ? 'text-slate-300' : 'text-slate-600'}`}>
+                Your smart beach day concierge · {timeTheme.text}
+              </p>
+            </div>
+          </div>
         </div>
       </header>
 
       <main className="mx-auto max-w-4xl px-4 py-8">
+        {/* Nighttime Banner */}
+        {(timeTheme.period === 'night' || timeTheme.period === 'dusk') && currentConditions?.sunrise && (
+          <div className={`mb-6 rounded-xl border p-4 ${timeTheme.period === 'night' ? 'bg-indigo-900/20 border-indigo-700' : 'bg-purple-50 border-purple-200'}`}>
+            <div className="flex items-center gap-3">
+              <div className="text-3xl">🌙</div>
+              <div className="flex-1">
+                <p className={`font-semibold ${timeTheme.period === 'night' ? 'text-white' : 'text-slate-900'}`}>
+                  It's nighttime—showing tomorrow's beach forecast
+                </p>
+                <p className={`text-sm mt-1 ${timeTheme.period === 'night' ? 'text-slate-300' : 'text-slate-600'}`}>
+                  🌅 Sunrise tomorrow at {formatTime(new Date(currentConditions.sunrise))} · Beach times shown below are for tomorrow!
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Beach Selector */}
         <BeachSelector
           beaches={beaches}
@@ -66,16 +107,16 @@ export default function HomePage({ beaches }: HomePageProps) {
         {/* Loading State */}
         {isLoading && (
           <div className="mt-8 text-center">
-            <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-sky-500 border-r-transparent"></div>
-            <p className="mt-4 text-slate-600">Loading conditions...</p>
+            <div className={`inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-r-transparent ${timeTheme.period === 'night' ? 'border-sky-400' : 'border-sky-500'}`}></div>
+            <p className={`mt-4 ${timeTheme.period === 'night' ? 'text-slate-300' : 'text-slate-600'}`}>Loading conditions...</p>
           </div>
         )}
 
         {/* Error State */}
         {error && (
-          <div className="mt-8 rounded-xl bg-red-50 p-6 text-center">
-            <p className="text-red-700">Failed to load beach conditions</p>
-            <p className="mt-2 text-sm text-red-600">
+          <div className={`mt-8 rounded-xl p-6 text-center ${timeTheme.period === 'night' ? 'bg-red-900/20 border border-red-700' : 'bg-red-50'}`}>
+            <p className={timeTheme.period === 'night' ? 'text-red-200' : 'text-red-700'}>Failed to load beach conditions</p>
+            <p className={`mt-2 text-sm ${timeTheme.period === 'night' ? 'text-red-300' : 'text-red-600'}`}>
               Please check your API keys and try again
             </p>
           </div>
@@ -84,77 +125,131 @@ export default function HomePage({ beaches }: HomePageProps) {
         {/* Main Content */}
         {!isLoading && !error && displayWindow && (
           <div className="mt-8 space-y-8">
-            {/* Hero: Best Window */}
-            <section>
-              <h2 className="mb-4 text-2xl font-bold text-slate-900">
-                {goNowWindow ? 'Go Now! 🌊' : 'Best Time Today'}
-              </h2>
-              <BeachScoreCard window={displayWindow} showDetails />
-            </section>
+            {/* Hero: Best Window - Only show if it's a current "Go Now" opportunity */}
+            {goNowWindow && goNowWindow.score > 30 && (
+              <section>
+                <h2 className={`mb-4 text-2xl font-bold ${timeTheme.period === 'night' ? 'text-white' : 'text-slate-900'}`}>
+                  Go Now! 🌊
+                </h2>
+                <BeachScoreCard window={displayWindow} showDetails />
+              </section>
+            )}
 
             {/* Current Conditions */}
-            <section>
-              <h2 className="mb-4 text-xl font-bold text-slate-900">
-                Current Conditions
-              </h2>
-              <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
-                <ConditionTile
-                  icon="🌡️"
-                  label="Temperature"
-                  value={formatTemp(displayWindow.conditions.temp)}
-                  status={
-                    displayWindow.conditions.temp >= 80 && displayWindow.conditions.temp <= 90
-                      ? 'safe'
-                      : displayWindow.conditions.temp < 70 || displayWindow.conditions.temp > 95
-                      ? 'danger'
-                      : 'caution'
-                  }
-                  subtitle={`Feels like ${formatTemp(displayWindow.conditions.feelsLike)}`}
-                />
-                <ConditionTile
-                  icon="☀️"
-                  label="UV Index"
-                  value={formatUV(displayWindow.conditions.uvIndex)}
-                  status={
-                    displayWindow.conditions.uvIndex <= 5
-                      ? 'safe'
-                      : displayWindow.conditions.uvIndex <= 7
-                      ? 'caution'
-                      : 'danger'
-                  }
-                  subtitle={getUVSafetyLevel(displayWindow.conditions.uvIndex).description}
-                />
-                <ConditionTile
-                  icon="💨"
-                  label="Wind"
-                  value={formatWindSpeed(displayWindow.conditions.windSpeed)}
-                  status={
-                    displayWindow.conditions.windSpeed < 10
-                      ? 'safe'
-                      : displayWindow.conditions.windSpeed < 20
-                      ? 'caution'
-                      : 'danger'
-                  }
-                  subtitle={displayWindow.conditions.windGust ? `Gusts ${displayWindow.conditions.windGust} mph` : 'Steady'}
-                />
-                <ConditionTile
-                  icon="🌊"
-                  label="Tide"
-                  value={formatTideHeight(displayWindow.conditions.tideHeight)}
-                  status="safe"
-                  subtitle={displayWindow.conditions.tideType}
-                />
-              </div>
-            </section>
-
-            {/* Other Time Windows */}
-            {windows.length > 1 && (
+            {currentConditions && (
               <section>
-                <h2 className="mb-4 text-xl font-bold text-slate-900">
-                  Other Times Today
+                <h2 className={`mb-4 text-xl font-bold ${timeTheme.period === 'night' ? 'text-white' : 'text-slate-900'}`}>
+                  Current Conditions
+                </h2>
+                <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+                  <ConditionTile
+                    icon="🌡️"
+                    label="Temperature"
+                    value={formatTemp(currentConditions.temp)}
+                    status={
+                      currentConditions.temp >= 80 && currentConditions.temp <= 90
+                        ? 'safe'
+                        : currentConditions.temp < 70 || currentConditions.temp > 95
+                        ? 'danger'
+                        : 'caution'
+                    }
+                    subtitle={`Feels like ${formatTemp(currentConditions.feelsLike)}`}
+                  />
+                  <ConditionTile
+                    icon="☀️"
+                    label="UV Index"
+                    value={formatUV(currentConditions.uvIndex)}
+                    status={
+                      currentConditions.uvIndex <= 5
+                        ? 'safe'
+                        : currentConditions.uvIndex <= 7
+                        ? 'caution'
+                        : 'danger'
+                    }
+                    subtitle={getUVSafetyLevel(currentConditions.uvIndex).description}
+                  />
+                  <ConditionTile
+                    icon="💨"
+                    label="Wind"
+                    value={formatWindSpeed(currentConditions.windSpeed)}
+                    status={
+                      currentConditions.windSpeed < 10
+                        ? 'safe'
+                        : currentConditions.windSpeed < 20
+                        ? 'caution'
+                        : 'danger'
+                    }
+                    subtitle={currentConditions.windGust ? `Gusts ${currentConditions.windGust} mph` : 'Steady'}
+                  />
+                  <ConditionTile
+                    icon="🌊"
+                    label="Tide"
+                    value={formatTideHeight(currentConditions.tideHeight)}
+                    status="safe"
+                    subtitle={currentConditions.tideType}
+                  />
+                </div>
+                
+                {/* Sun Info */}
+                {(currentConditions.sunrise || currentConditions.sunset || currentConditions.sunExposure !== undefined) && (
+                  <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-3">
+                    {currentConditions.sunrise && (
+                      <ConditionTile
+                        icon="🌅"
+                        label="Sunrise"
+                        value={formatTime(new Date(currentConditions.sunrise))}
+                        status="safe"
+                      />
+                    )}
+                    {currentConditions.sunset && (
+                      <ConditionTile
+                        icon="🌇"
+                        label="Sunset"
+                        value={formatTime(new Date(currentConditions.sunset))}
+                        status="safe"
+                      />
+                    )}
+                    {currentConditions.sunExposure !== undefined && (
+                      <ConditionTile
+                        icon={currentConditions.sunExposure >= 80 ? '☀️' : currentConditions.sunExposure >= 50 ? '⛅' : '☁️'}
+                        label="Sun Exposure"
+                        value={`${Math.round(currentConditions.sunExposure)}%`}
+                        status={
+                          currentConditions.sunExposure >= 80
+                            ? 'safe'
+                            : currentConditions.sunExposure >= 50
+                            ? 'caution'
+                            : 'danger'
+                        }
+                        subtitle={
+                          currentConditions.sunExposure >= 80
+                            ? 'Sunny!'
+                            : currentConditions.sunExposure >= 50
+                            ? 'Partly cloudy'
+                            : 'Mostly cloudy'
+                        }
+                      />
+                    )}
+                  </div>
+                )}
+              </section>
+            )}
+
+            {/* Upcoming Beach Windows */}
+            {windows.length > 0 && (
+              <section>
+                <h2 className={`mb-4 text-xl font-bold ${timeTheme.period === 'night' ? 'text-white' : 'text-slate-900'}`}>
+                  {timeTheme.period === 'night' || timeTheme.period === 'dusk' 
+                    ? 'Tomorrow\'s Beach Times' 
+                    : goNowWindow && goNowWindow.score > 30 
+                    ? 'Other Times Today' 
+                    : 'Beach Times Today'}
                 </h2>
                 <div className="grid gap-4 sm:grid-cols-2">
-                  {windows.slice(1, 4).map((window: Window) => (
+                  {(goNowWindow && goNowWindow.score > 30 
+                    ? windows.slice(1, 5) 
+                    : windows.slice(0, 4)
+                  ).map((window: Window) => (
                     <WindowCard
                       key={window.id}
                       window={window}
@@ -167,20 +262,34 @@ export default function HomePage({ beaches }: HomePageProps) {
           </div>
         )}
 
+        {/* Weekly Forecast */}
+        {!isLoading && !error && forecastData?.forecast && (
+          <section className="mt-8">
+            <WeeklyForecast 
+              forecast={forecastData.forecast}
+              beachName={forecastData.beach?.name || 'this beach'}
+            />
+          </section>
+        )}
+
         {/* No Data State */}
         {!isLoading && !error && windows.length === 0 && (
-          <div className="mt-8 rounded-xl bg-slate-50 p-8 text-center">
-            <p className="text-lg text-slate-600">
-              No forecast data available for this beach
+          <div className={`mt-8 rounded-xl p-8 text-center ${timeTheme.period === 'night' ? 'bg-slate-800/50 border border-slate-700' : 'bg-sky-50 border border-sky-200'}`}>
+            <div className="mb-4 text-5xl">🏖️</div>
+            <p className={`text-xl font-bold mb-2 ${timeTheme.period === 'night' ? 'text-white' : 'text-slate-900'}`}>
+              No Forecast Data Available
+            </p>
+            <p className={`text-sm ${timeTheme.period === 'night' ? 'text-slate-300' : 'text-slate-600'}`}>
+              Unable to load beach conditions for this location. Please try again later.
             </p>
           </div>
         )}
       </main>
 
       {/* Footer */}
-      <footer className="mt-16 border-t border-slate-200 bg-white py-8">
-        <div className="mx-auto max-w-4xl px-4 text-center text-sm text-slate-500">
-          <p>Beach Buddy · Palm Harbor, FL · Made with ☀️</p>
+      <footer className={`mt-16 border-t py-8 ${timeTheme.period === 'night' ? 'border-slate-700 bg-slate-800' : 'border-slate-200 bg-white'}`}>
+        <div className={`mx-auto max-w-4xl px-4 text-center text-sm ${timeTheme.period === 'night' ? 'text-slate-400' : 'text-slate-500'}`}>
+          <p>Beach Buddy · Palm Harbor, FL · Made with {timeTheme.emoji}</p>
         </div>
       </footer>
     </div>

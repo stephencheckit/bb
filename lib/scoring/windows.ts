@@ -16,7 +16,7 @@ export interface WindowOptions {
 
 const DEFAULT_OPTIONS: WindowOptions = {
   duration: 3, // 3-hour windows
-  count: 4, // next 12 hours (4 windows)
+  count: 16, // Request more to filter for daylight windows
 };
 
 /**
@@ -44,6 +44,29 @@ export async function generateWindows(
     // Calculate score for this window
     const scored = calculateBeachScore(snapshot, opts.preferences);
     
+    // Check if window is during nighttime (before sunrise or after sunset)
+    if (snapshot.sunrise && snapshot.sunset) {
+      const windowStart = snapshot.timestamp.getTime();
+      const windowEnd = windowStart + opts.duration * 60 * 60 * 1000;
+      const sunriseTime = typeof snapshot.sunrise === 'string' ? new Date(snapshot.sunrise).getTime() : snapshot.sunrise.getTime();
+      const sunsetTime = typeof snapshot.sunset === 'string' ? new Date(snapshot.sunset).getTime() : snapshot.sunset.getTime();
+      
+      // Mark as nighttime if MAJORITY of window is outside daylight hours
+      // Window is nighttime if it starts after sunset OR ends before sunrise
+      const isNighttime = windowStart >= sunsetTime || windowEnd <= sunriseTime;
+      
+      if (isNighttime) {
+        scored.window.badges.push({
+          id: 'nighttime',
+          label: '🌙 Nighttime',
+          icon: '🌙',
+          type: 'negative',
+        });
+        // Heavily penalize nighttime windows
+        scored.window.score = Math.min(scored.window.score, 30);
+      }
+    }
+    
     // Set window duration
     scored.window.endTime = new Date(
       scored.window.startTime.getTime() + opts.duration * 60 * 60 * 1000
@@ -52,12 +75,22 @@ export async function generateWindows(
     windows.push(scored.window);
   }
 
-  // Sort by score (best first)
-  windows.sort((a, b) => b.score - a.score);
+  // Separate daytime and nighttime windows
+  const daytimeWindows = windows.filter(w => w.score > 30); // Not nighttime
+  const nighttimeWindows = windows.filter(w => w.score <= 30); // Nighttime
 
-  // Mark "Go Now" window (best window that includes current time)
+  // Sort daytime windows by score (best first)
+  daytimeWindows.sort((a, b) => b.score - a.score);
+  
+  // Sort nighttime windows by time (chronologically)
+  nighttimeWindows.sort((a, b) => a.startTime.getTime() - b.startTime.getTime());
+
+  // Combine: prioritize daytime windows, then add nighttime if needed
+  const sortedWindows = [...daytimeWindows, ...nighttimeWindows];
+
+  // Mark "Go Now" window (best daytime window that includes current time)
   const currentTime = now.getTime();
-  const goNowWindow = windows.find((w) => {
+  const goNowWindow = daytimeWindows.find((w) => {
     const start = w.startTime.getTime();
     const end = w.endTime.getTime();
     return currentTime >= start && currentTime <= end;
@@ -65,11 +98,11 @@ export async function generateWindows(
 
   if (goNowWindow) {
     goNowWindow.isGoNow = true;
-  } else {
-    // If no window contains current time, mark the best window
+  } else if (daytimeWindows.length > 0) {
+    // If no daytime window contains current time, mark the best daytime window
     // that starts within the next hour as "Go Now"
     const nextHour = currentTime + 60 * 60 * 1000;
-    const upcomingWindow = windows.find(
+    const upcomingWindow = daytimeWindows.find(
       (w) => w.startTime.getTime() >= currentTime && w.startTime.getTime() <= nextHour
     );
     
@@ -78,7 +111,7 @@ export async function generateWindows(
     }
   }
 
-  return windows;
+  return sortedWindows;
 }
 
 /**

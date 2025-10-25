@@ -16,17 +16,18 @@ export const metadata: Metadata = {
   title: "Beach Buddy - Your Smart Beach Day Concierge",
   description: "Find the perfect time to hit the beach with intelligent weather, tide, and UV forecasts for Palm Harbor, FL beaches.",
   manifest: "/manifest.json",
-  themeColor: "#0ea5e9",
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
     title: "Beach Buddy",
   },
-  viewport: {
-    width: "device-width",
-    initialScale: 1,
-    maximumScale: 1,
-  },
+};
+
+export const viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  themeColor: "#0ea5e9",
 };
 
 export default function RootLayout({

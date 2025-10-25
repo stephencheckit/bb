@@ -87,13 +87,13 @@ export function BeachSelector({
                     className={`flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left transition-colors ${
                       isSelected
                         ? 'bg-sky-50 text-sky-900'
-                        : 'hover:bg-slate-50'
+                        : 'text-slate-900 hover:bg-slate-50'
                     }`}
                   >
                     {isFavorite && <span className="text-amber-500">⭐</span>}
                     <div className="flex-1">
-                      <p className="font-medium">{beach.name}</p>
-                      <p className="text-xs text-slate-500">
+                      <p className="font-semibold">{beach.name}</p>
+                      <p className="text-xs text-slate-600">
                         {beach.facilities.lifeguard && '🏊 Lifeguard'}{' '}
                         {beach.facilities.restroom && '🚻 Restroom'}{' '}
                         {beach.parking.available && '🅿️ Parking'}

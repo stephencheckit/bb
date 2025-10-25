@@ -27,6 +27,11 @@ export interface ConditionSnapshot {
   tideHeight: number; // feet
   tideType: TideType;
   nextTideEvent?: TideEvent;
+  
+  // Sun
+  sunrise?: Date;
+  sunset?: Date;
+  sunExposure?: number; // 0-100, how sunny (inverse of cloud cover)
 }
 
 export type TideType = 'high' | 'low' | 'rising' | 'falling' | 'slack';

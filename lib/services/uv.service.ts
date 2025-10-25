@@ -36,7 +36,8 @@ export async function getUVIndex(
   time?: Date
 ): Promise<UVData> {
   if (!API_KEY) {
-    throw new Error('OpenUV API key not configured');
+    console.warn('⚠️ Using mock UV data - API key not configured');
+    return getFallbackUVData(time || new Date());
   }
 
   const url = `${BASE_URL}/uv?lat=${lat}&lng=${lon}`;
@@ -50,7 +51,8 @@ export async function getUVIndex(
     });
 
     if (!response.ok) {
-      throw new Error(`OpenUV API error: ${response.status}`);
+      console.warn('⚠️ Using mock UV data - API error:', response.status);
+      return getFallbackUVData(time || new Date());
     }
 
     const data = await response.json();
@@ -63,7 +65,7 @@ export async function getUVIndex(
       timestamp: new Date(result.uv_time),
     };
   } catch (error) {
-    console.error('Error fetching UV index:', error);
+    console.warn('⚠️ Using mock UV data - API error:', error);
     // Return fallback UV data based on time of day
     return getFallbackUVData(time || new Date());
   }
@@ -121,18 +123,19 @@ function getFallbackUVData(time: Date): UVData {
   let estimatedUV = 0;
   
   if (hour >= 6 && hour <= 19) {
-    // Daytime hours
+    // Daytime hours - realistic Florida UV levels
     const minutesSinceSunrise = (hour - 6) * 60;
     const minutesOfDaylight = 13 * 60;
     const progress = minutesSinceSunrise / minutesOfDaylight;
     
     // Bell curve peaking at noon (progress = 0.5)
-    estimatedUV = 10 * Math.sin(progress * Math.PI);
+    // Florida typically has UV 8-10 at peak
+    estimatedUV = 9 * Math.sin(progress * Math.PI);
   }
 
   return {
     uvIndex: Math.round(estimatedUV * 10) / 10,
-    uvMax: 10, // Assume max possible for Florida
+    uvMax: 9, // Typical Florida max
     timestamp: time,
   };
 }

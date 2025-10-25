@@ -37,8 +37,9 @@ export async function GET(request: NextRequest) {
 
   try {
     // Fetch hourly forecast and current tide
+    // Fetch 48 hours to ensure we have enough daylight windows after filtering nighttime
     const [forecastData, tideData, currentUV] = await Promise.all([
-      getHourlyForecast(beach.lat, beach.lon, 12),
+      getHourlyForecast(beach.lat, beach.lon, 48),
       getTideData(beach.noaaStationId),
       getUVIndex(beach.lat, beach.lon),
     ]);
@@ -61,10 +62,17 @@ export async function GET(request: NextRequest) {
       tideHeight: tideData.currentHeight,
       tideType: tideData.tideType,
       nextTideEvent: tideData.nextHigh || tideData.nextLow,
+      sunrise: weather.sunrise,
+      sunset: weather.sunset,
+      sunExposure: weather.sunExposure,
     }));
 
     // Generate windows with scores
-    const windows = await generateWindows(beach, conditions);
+    // Request more windows to account for nighttime filtering
+    const windows = await generateWindows(beach, conditions, {
+      count: 16, // More windows to ensure we get enough daylight ones
+      duration: 3,
+    });
 
     return NextResponse.json({ windows, beach }, {
       headers: {

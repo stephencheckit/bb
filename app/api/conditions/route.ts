@@ -60,6 +60,9 @@ export async function GET(request: NextRequest) {
       tideHeight: tideData.currentHeight,
       tideType: tideData.tideType,
       nextTideEvent: tideData.nextHigh || tideData.nextLow,
+      sunrise: weather.sunrise,
+      sunset: weather.sunset,
+      sunExposure: weather.sunExposure,
     };
 
     return NextResponse.json({ conditions }, {
