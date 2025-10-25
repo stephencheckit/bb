@@ -124,7 +124,7 @@ export function BestDayCard({ day, beachId }: BestDayCardProps) {
 
       {/* Pack List Button */}
       <Link
-        href={`/plan?beachId=${beachId}&windowStart=${windowStart.toISOString()}&windowEnd=${windowEnd.toISOString()}`}
+        href={`/plan?beachId=${beachId}&windowStart=${windowStart.toISOString()}&windowEnd=${windowEnd.toISOString()}&temp=${day.highTemp}&uvIndex=${day.uvIndex}&windSpeed=${day.windSpeed}`}
         className="block w-full rounded-full bg-gradient-to-r from-sky-500 to-blue-600 py-3 text-center font-bold text-white shadow-md transition-all hover:shadow-lg hover:from-sky-600 hover:to-blue-700"
       >
         📋 View Pack List & Details

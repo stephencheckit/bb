@@ -19,6 +19,11 @@ function PlanContent() {
   const beachId = searchParams.get('beachId');
   const windowStart = searchParams.get('windowStart');
   const windowEnd = searchParams.get('windowEnd');
+  
+  // Check if conditions are passed via query params (for future dates)
+  const tempParam = searchParams.get('temp');
+  const uvIndexParam = searchParams.get('uvIndex');
+  const windSpeedParam = searchParams.get('windSpeed');
 
   const [plan, setPlan] = useState<Plan | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -26,17 +31,32 @@ function PlanContent() {
   // Find beach
   const beach = beaches.find((b: Beach) => b.id === beachId);
 
-  // Fetch conditions for the selected window
+  // Fetch conditions for the selected window (only if not passed via params)
+  const shouldFetchConditions = !tempParam && !uvIndexParam && !windSpeedParam;
   const { data: conditionsData } = useSWR(
-    beachId ? `/api/conditions?beachId=${beachId}` : null,
+    shouldFetchConditions && beachId ? `/api/conditions?beachId=${beachId}` : null,
     fetcher
   );
 
-  // Generate plan when we have conditions
+  // Generate plan when we have conditions (either from API or query params)
   useEffect(() => {
-    if (!beachId || !windowStart || !windowEnd || !conditionsData) {
+    if (!beachId || !windowStart || !windowEnd) {
       setIsLoading(false);
       return;
+    }
+
+    // Use query params if available, otherwise wait for API data
+    let conditions;
+    if (tempParam && uvIndexParam && windSpeedParam) {
+      conditions = {
+        temp: parseFloat(tempParam),
+        uvIndex: parseFloat(uvIndexParam),
+        windSpeed: parseFloat(windSpeedParam),
+      };
+    } else if (conditionsData) {
+      conditions = conditionsData.conditions;
+    } else {
+      return; // Still waiting for data
     }
 
     const generatePlan = async () => {
@@ -48,7 +68,7 @@ function PlanContent() {
             beachId,
             windowStart,
             windowEnd,
-            conditions: conditionsData.conditions,
+            conditions,
           }),
         });
 
@@ -62,7 +82,7 @@ function PlanContent() {
     };
 
     generatePlan();
-  }, [beachId, windowStart, windowEnd, conditionsData]);
+  }, [beachId, windowStart, windowEnd, conditionsData, tempParam, uvIndexParam, windSpeedParam]);
 
   if (!beach) {
     return (
