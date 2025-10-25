@@ -1,0 +1,179 @@
+[
+  {
+    "id": "honeymoon-island",
+    "name": "Honeymoon Island State Park",
+    "lat": 28.0632,
+    "lon": -82.8282,
+    "noaaStationId": "8726724",
+    "facilities": {
+      "restroom": true,
+      "shower": true,
+      "lifeguard": true,
+      "foodNearby": true,
+      "shadeStructures": true,
+      "beachWheelchair": true
+    },
+    "parking": {
+      "available": true,
+      "cost": "$8 per vehicle",
+      "notes": "Large parking lot, rarely full except summer weekends. Arrive before 10am for best spots."
+    },
+    "description": "Natural beach with pristine waters, nature trails, and excellent shelling. Pet beach area available.",
+    "accessibility": "ADA accessible with beach wheelchairs available at ranger station."
+  },
+  {
+    "id": "clearwater-beach",
+    "name": "Clearwater Beach",
+    "lat": 27.9783,
+    "lon": -82.8272,
+    "noaaStationId": "8726724",
+    "facilities": {
+      "restroom": true,
+      "shower": true,
+      "lifeguard": true,
+      "foodNearby": true,
+      "shadeStructures": false,
+      "beachWheelchair": true
+    },
+    "parking": {
+      "available": true,
+      "cost": "$3-4/hour in garages",
+      "notes": "Multiple parking garages. Beach Walk garage most convenient. Can be very busy."
+    },
+    "description": "Award-winning white sand beach with tons of amenities, restaurants, and activities. Very popular.",
+    "accessibility": "Fully ADA accessible. Beach wheelchairs available at Beach Operations office."
+  },
+  {
+    "id": "caladesi-island",
+    "name": "Caladesi Island State Park",
+    "lat": 28.0253,
+    "lon": -82.8053,
+    "noaaStationId": "8726724",
+    "facilities": {
+      "restroom": true,
+      "shower": true,
+      "lifeguard": false,
+      "foodNearby": true,
+      "shadeStructures": true,
+      "beachWheelchair": false
+    },
+    "parking": {
+      "available": false,
+      "cost": "Ferry: $18 adults, $11 children",
+      "notes": "Accessible only by boat. Ferry runs from Honeymoon Island. Limited capacity."
+    },
+    "description": "Pristine, undeveloped island beach consistently rated among best in US. Nature trails and kayak rentals.",
+    "accessibility": "Limited accessibility due to boat access and natural terrain."
+  },
+  {
+    "id": "fred-howard-park",
+    "name": "Fred Howard Park Beach",
+    "lat": 28.1117,
+    "lon": -82.7475,
+    "noaaStationId": "8726724",
+    "facilities": {
+      "restroom": true,
+      "shower": true,
+      "lifeguard": true,
+      "foodNearby": false,
+      "shadeStructures": true,
+      "beachWheelchair": false
+    },
+    "parking": {
+      "available": true,
+      "cost": "Free",
+      "notes": "Ample free parking. Popular with locals, especially on weekends."
+    },
+    "description": "Causeway leads to beautiful beach island. Shallow waters perfect for families. Playgrounds and picnic areas.",
+    "accessibility": "Paved paths to beach area. Limited sand accessibility."
+  },
+  {
+    "id": "dunedin-causeway",
+    "name": "Dunedin Causeway Beach",
+    "lat": 28.0300,
+    "lon": -82.8000,
+    "noaaStationId": "8726724",
+    "facilities": {
+      "restroom": true,
+      "shower": false,
+      "lifeguard": false,
+      "foodNearby": true,
+      "shadeStructures": false,
+      "beachWheelchair": false
+    },
+    "parking": {
+      "available": true,
+      "cost": "Free",
+      "notes": "Parking along causeway. Can fill up on weekends. Multiple access points."
+    },
+    "description": "Dog-friendly beach with calm waters. Popular with kayakers and paddle boarders. Great for sunsets.",
+    "accessibility": "Easy beach access from parking. Some areas have steep sand."
+  },
+  {
+    "id": "sand-key-park",
+    "name": "Sand Key Park",
+    "lat": 27.9294,
+    "lon": -82.8517,
+    "noaaStationId": "8726724",
+    "facilities": {
+      "restroom": true,
+      "shower": true,
+      "lifeguard": true,
+      "foodNearby": true,
+      "shadeStructures": true,
+      "beachWheelchair": true
+    },
+    "parking": {
+      "available": true,
+      "cost": "Free",
+      "notes": "Large lot, but fills quickly on weekends. Arrive early."
+    },
+    "description": "Natural dunes and sea oats. Great for shelling. Quieter than nearby Clearwater Beach.",
+    "accessibility": "ADA accessible facilities. Beach wheelchair available."
+  },
+  {
+    "id": "indian-rocks-beach",
+    "name": "Indian Rocks Beach",
+    "lat": 27.8975,
+    "lon": -82.8428,
+    "noaaStationId": "8726724",
+    "facilities": {
+      "restroom": true,
+      "shower": true,
+      "lifeguard": true,
+      "foodNearby": true,
+      "shadeStructures": false,
+      "beachWheelchair": false
+    },
+    "parking": {
+      "available": true,
+      "cost": "Metered parking on side streets",
+      "notes": "Street parking and small public lots. Can be challenging on busy days."
+    },
+    "description": "Quiet residential beach with local charm. Less crowded than tourist beaches. Good for families.",
+    "accessibility": "Beach access at multiple public access points. Some have ramps."
+  },
+  {
+    "id": "madeira-beach",
+    "name": "Madeira Beach",
+    "lat": 27.7997,
+    "lon": -82.7987,
+    "noaaStationId": "8726724",
+    "facilities": {
+      "restroom": true,
+      "shower": true,
+      "lifeguard": true,
+      "foodNearby": true,
+      "shadeStructures": false,
+      "beachWheelchair": false
+    },
+    "parking": {
+      "available": true,
+      "cost": "Metered parking, some free lots",
+      "notes": "John's Pass area has paid parking. Public beach accesses have limited free parking."
+    },
+    "description": "Lively beach near John's Pass Village. Great for dining, shopping, and water sports. Sunset celebrations.",
+    "accessibility": "Several ADA accessible beach entrances. Boardwalk at John's Pass is wheelchair accessible."
+  }
+]
+
