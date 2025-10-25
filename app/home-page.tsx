@@ -204,47 +204,58 @@ export default function HomePage({ beaches }: HomePageProps) {
                 </div>
                 
                 {/* Sun Info */}
-                {(currentConditions.sunrise || currentConditions.sunset || currentConditions.sunExposure !== undefined) && (
-                  <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-3">
-                    {currentConditions.sunrise && (
-                      <ConditionTile
-                        icon="🌅"
-                        label="Sunrise"
-                        value={formatTime(new Date(currentConditions.sunrise))}
-                        status="safe"
-                      />
-                    )}
-                    {currentConditions.sunset && (
-                      <ConditionTile
-                        icon="🌇"
-                        label="Sunset"
-                        value={formatTime(new Date(currentConditions.sunset))}
-                        status="safe"
-                      />
-                    )}
-                    {currentConditions.sunExposure !== undefined && (
-                      <ConditionTile
-                        icon={currentConditions.sunExposure >= 80 ? '☀️' : currentConditions.sunExposure >= 50 ? '⛅' : '☁️'}
-                        label="Sun Exposure"
-                        value={`${Math.round(currentConditions.sunExposure)}%`}
-                        status={
-                          currentConditions.sunExposure >= 80
-                            ? 'safe'
-                            : currentConditions.sunExposure >= 50
-                            ? 'caution'
-                            : 'danger'
-                        }
-                        subtitle={
-                          currentConditions.sunExposure >= 80
-                            ? 'Sunny!'
-                            : currentConditions.sunExposure >= 50
-                            ? 'Partly cloudy'
-                            : 'Mostly cloudy'
-                        }
-                      />
-                    )}
-                  </div>
-                )}
+                {(currentConditions.sunrise || currentConditions.sunset || currentConditions.sunExposure !== undefined) && (() => {
+                  // Check if it's actually nighttime right now
+                  const now = new Date();
+                  const sunrise = currentConditions.sunrise ? new Date(currentConditions.sunrise) : null;
+                  const sunset = currentConditions.sunset ? new Date(currentConditions.sunset) : null;
+                  const isCurrentlyNight = sunrise && sunset && (now < sunrise || now > sunset);
+                  const actualSunExposure = isCurrentlyNight ? 0 : currentConditions.sunExposure;
+                  
+                  return (
+                    <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-3">
+                      {currentConditions.sunrise && (
+                        <ConditionTile
+                          icon="🌅"
+                          label="Sunrise"
+                          value={formatTime(new Date(currentConditions.sunrise))}
+                          status="safe"
+                        />
+                      )}
+                      {currentConditions.sunset && (
+                        <ConditionTile
+                          icon="🌇"
+                          label="Sunset"
+                          value={formatTime(new Date(currentConditions.sunset))}
+                          status="safe"
+                        />
+                      )}
+                      {actualSunExposure !== undefined && (
+                        <ConditionTile
+                          icon={actualSunExposure >= 80 ? '☀️' : actualSunExposure >= 50 ? '⛅' : actualSunExposure > 0 ? '☁️' : '🌙'}
+                          label="Sun Exposure"
+                          value={`${Math.round(actualSunExposure)}%`}
+                          status={
+                            actualSunExposure >= 80
+                              ? 'safe'
+                              : actualSunExposure >= 50
+                              ? 'caution'
+                              : 'danger'
+                          }
+                          subtitle={
+                            actualSunExposure === 0
+                              ? 'Nighttime'
+                              : actualSunExposure >= 80
+                              ? 'Sunny!'
+                              : actualSunExposure >= 50
+                              ? 'Partly cloudy'
+                              : 'Mostly cloudy'
+                          }
+                        />
+                      )}
+                    </div>
+                  );
+                })()}
               </section>
             )}
 

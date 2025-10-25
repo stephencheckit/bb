@@ -118,7 +118,7 @@ export function WeeklyForecast({ forecast, beachName }: WeeklyForecastProps) {
       {/* Legend */}
       <div className="mt-4 border-t border-slate-200 pt-4">
         <p className="text-xs text-slate-500">
-          💡 Scores are based on afternoon conditions (temp, UV, wind, weather). Click a day for detailed hourly windows.
+          💡 Scores are based on afternoon conditions (temp, UV, wind, weather).
         </p>
       </div>
     </div>

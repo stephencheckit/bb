@@ -46,14 +46,16 @@ export async function generateWindows(
     
     // Check if window is during nighttime (before sunrise or after sunset)
     if (snapshot.sunrise && snapshot.sunset) {
-      const windowStart = snapshot.timestamp.getTime();
-      const windowEnd = windowStart + opts.duration * 60 * 60 * 1000;
-      const sunriseTime = typeof snapshot.sunrise === 'string' ? new Date(snapshot.sunrise).getTime() : snapshot.sunrise.getTime();
-      const sunsetTime = typeof snapshot.sunset === 'string' ? new Date(snapshot.sunset).getTime() : snapshot.sunset.getTime();
+      const windowStart = new Date(snapshot.timestamp);
+      const windowEnd = new Date(windowStart.getTime() + opts.duration * 60 * 60 * 1000);
+      const sunrise = new Date(snapshot.sunrise);
+      const sunset = new Date(snapshot.sunset);
       
-      // Mark as nighttime if MAJORITY of window is outside daylight hours
-      // Window is nighttime if it starts after sunset OR ends before sunrise
-      const isNighttime = windowStart >= sunsetTime || windowEnd <= sunriseTime;
+      // Check if window overlaps with nighttime
+      // It's nighttime if: window starts after sunset OR window ends before sunrise
+      const startsAfterSunset = windowStart >= sunset;
+      const endsBeforeSunrise = windowEnd <= sunrise;
+      const isNighttime = startsAfterSunset || endsBeforeSunrise;
       
       if (isNighttime) {
         scored.window.badges.push({
@@ -63,7 +65,7 @@ export async function generateWindows(
           type: 'negative',
         });
         // Heavily penalize nighttime windows
-        scored.window.score = Math.min(scored.window.score, 30);
+        scored.window.score = 30;
       }
     }
     
