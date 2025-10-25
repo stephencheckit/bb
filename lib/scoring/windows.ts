@@ -56,19 +56,6 @@ export async function generateWindows(
       const isAfterSunset = windowMidpoint > sunset;
       const isNighttime = isBeforeSunrise || isAfterSunset;
       
-      // Debug logging
-      if (windowStart.getHours() < 7) {
-        console.log('🌙 Night check:', {
-          window: windowStart.toLocaleString(),
-          midpoint: windowMidpoint.toLocaleString(),
-          sunrise: sunrise.toLocaleString(),
-          sunset: sunset.toLocaleString(),
-          isBeforeSunrise,
-          isAfterSunset,
-          isNighttime
-        });
-      }
-      
       if (isNighttime) {
         scored.window.badges.push({
           id: 'nighttime',

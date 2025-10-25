@@ -55,14 +55,14 @@ export function WeeklyForecast({ forecast, beachName }: WeeklyForecastProps) {
       <h3 className="mb-4 text-lg font-bold text-slate-900">
         7-Day Beach Forecast
       </h3>
-      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-7">
+      <div className="flex gap-3 overflow-x-auto pb-2 sm:grid sm:grid-cols-2 lg:grid-cols-7">
         {forecast.map((day, index) => {
           const scoreRange = getScoreRange(day.score);
           
           return (
             <div
               key={index}
-              className="flex flex-col items-center rounded-xl border border-slate-200 bg-slate-50 p-4 transition-all hover:border-slate-300 hover:shadow-md"
+              className="flex min-w-[140px] flex-col items-center rounded-xl border border-slate-200 bg-slate-50 p-4 transition-all hover:border-slate-300 hover:shadow-md sm:min-w-0"
             >
               {/* Day Name */}
               <p className="mb-2 text-sm font-semibold text-slate-900">

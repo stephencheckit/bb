@@ -259,30 +259,6 @@ export default function HomePage({ beaches }: HomePageProps) {
               </section>
             )}
 
-            {/* Upcoming Beach Windows */}
-            {windows.length > 0 && (
-              <section>
-                <h2 className={`mb-4 text-xl font-bold ${timeTheme.period === 'night' ? 'text-white' : 'text-slate-900'}`}>
-                  {timeTheme.period === 'night' || timeTheme.period === 'dusk' 
-                    ? 'Upcoming' 
-                    : goNowWindow && goNowWindow.score > 30 
-                    ? 'Other Times Today' 
-                    : 'Beach Times Today'}
-                </h2>
-                <div className="grid gap-4 sm:grid-cols-2">
-                  {(goNowWindow && goNowWindow.score > 30 
-                    ? windows.slice(1, 5) 
-                    : windows.slice(0, 4)
-                  ).map((window: Window) => (
-                    <WindowCard
-                      key={window.id}
-                      window={window}
-                      beachId={selectedBeachId}
-                    />
-                  ))}
-                </div>
-              </section>
-            )}
           </div>
         )}
 
