@@ -58,7 +58,7 @@ export async function POST(request: NextRequest) {
       departureTime,
       arrivalTime: windowStartTime,
       checklist,
-      nearbyPlaces: nearbyPlaces.slice(0, 10), // Top 10 places
+      nearbyPlaces: nearbyPlaces.slice(0, 20), // Top 20 places (food, groceries, beach shops, etc.)
       parkingTips: beach.parking.notes || 'Check parking availability',
       createdAt: new Date(),
     };

@@ -203,9 +203,12 @@ function PlanContent() {
         {plan.nearbyPlaces.length > 0 && (
           <section className="mt-8">
             <h2 className="mb-4 text-2xl font-bold text-slate-900">
-              Nearby Food & Drink
+              Nearby Essentials 🗺️
             </h2>
-            <PlacesList places={plan.nearbyPlaces} maxItems={5} />
+            <p className="mb-4 text-sm text-slate-600">
+              Food, drinks, groceries, beach supplies & more within walking distance
+            </p>
+            <PlacesList places={plan.nearbyPlaces} maxItems={12} />
           </section>
         )}
 

@@ -12,7 +12,10 @@ const TYPE_LABELS = {
   restaurant: 'Restaurant',
   cafe: 'Cafe',
   bar: 'Bar',
-  convenience: 'Store',
+  convenience: 'Convenience Store',
+  grocery: 'Grocery Store',
+  liquor: 'Liquor Store',
+  'beach-shop': 'Beach Shop',
 };
 
 const TYPE_ICONS = {
@@ -20,9 +23,12 @@ const TYPE_ICONS = {
   cafe: '☕',
   bar: '🍹',
   convenience: '🏪',
+  grocery: '🛒',
+  liquor: '🍷',
+  'beach-shop': '🏄',
 };
 
-export function PlacesList({ places, maxItems = 10 }: PlacesListProps) {
+export function PlacesList({ places, maxItems = 15 }: PlacesListProps) {
   const displayPlaces = places.slice(0, maxItems);
 
   if (displayPlaces.length === 0) {

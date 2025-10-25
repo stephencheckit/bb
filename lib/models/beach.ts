@@ -32,7 +32,7 @@ export interface ParkingInfo {
 export interface NearbyPlace {
   id: string;
   name: string;
-  type: 'restaurant' | 'cafe' | 'bar' | 'convenience';
+  type: 'restaurant' | 'cafe' | 'bar' | 'convenience' | 'grocery' | 'liquor' | 'beach-shop';
   lat: number;
   lon: number;
   distance: number; // in meters

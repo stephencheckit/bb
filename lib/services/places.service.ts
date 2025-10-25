@@ -13,17 +13,17 @@ const OVERPASS_URL = 'https://overpass-api.de/api/interpreter';
 export async function getNearbyPlaces(
   lat: number,
   lon: number,
-  radius: number = 1500, // meters
-  types: string[] = ['restaurant', 'cafe', 'bar', 'fast_food']
+  radius: number = 2000, // meters (increased to 2km for better coverage)
+  includeAll: boolean = true
 ): Promise<NearbyPlace[]> {
-  // Build Overpass QL query
-  const amenityFilters = types.map(t => `amenity=${t}`).join('|');
-  
+  // Build comprehensive Overpass QL query for food, drinks, and beach essentials
   const query = `
     [out:json][timeout:25];
     (
-      node["amenity"~"${amenityFilters}"](around:${radius},${lat},${lon});
-      way["amenity"~"${amenityFilters}"](around:${radius},${lat},${lon});
+      node["amenity"~"restaurant|cafe|bar|pub|fast_food|ice_cream|food_court"](around:${radius},${lat},${lon});
+      way["amenity"~"restaurant|cafe|bar|pub|fast_food|ice_cream|food_court"](around:${radius},${lat},${lon});
+      node["shop"~"convenience|supermarket|alcohol|beverages|wine|sports|beach|surf"](around:${radius},${lat},${lon});
+      way["shop"~"convenience|supermarket|alcohol|beverages|wine|sports|beach|surf"](around:${radius},${lat},${lon});
     );
     out body;
     >;
@@ -49,7 +49,7 @@ export async function getNearbyPlaces(
     // Process results
     const places: NearbyPlace[] = data.elements
       .filter((el: { tags?: { name?: string } }) => el.tags && el.tags.name)
-      .map((el: { type: string; id: number; lat?: number; lon?: number; center?: { lat: number; lon: number }; tags: { name: string; amenity: string; opening_hours?: string } }) => {
+      .map((el: { type: string; id: number; lat?: number; lon?: number; center?: { lat: number; lon: number }; tags: { name: string; amenity?: string; shop?: string; opening_hours?: string } }) => {
         // Handle both nodes and ways
         const placeLat = el.lat || (el.center?.lat);
         const placeLon = el.lon || (el.center?.lon);
@@ -64,7 +64,7 @@ export async function getNearbyPlaces(
         return {
           id: `osm-${el.type}-${el.id}`,
           name: el.tags.name,
-          type: mapAmenityType(el.tags.amenity),
+          type: mapPlaceType(el.tags.amenity, el.tags.shop),
           lat: placeLat,
           lon: placeLon,
           distance: Math.round(distance),
@@ -111,26 +111,51 @@ function calculateDistance(
 }
 
 /**
- * Map OSM amenity types to our simplified types
+ * Map OSM amenity and shop types to our simplified types
  */
-function mapAmenityType(
-  amenity: string
-): 'restaurant' | 'cafe' | 'bar' | 'convenience' {
-  switch (amenity) {
-    case 'restaurant':
-    case 'fast_food':
-      return 'restaurant';
-    case 'cafe':
-      return 'cafe';
-    case 'bar':
-    case 'pub':
-      return 'bar';
-    case 'convenience':
-    case 'shop':
-      return 'convenience';
-    default:
-      return 'restaurant';
+function mapPlaceType(
+  amenity?: string,
+  shop?: string
+): 'restaurant' | 'cafe' | 'bar' | 'convenience' | 'grocery' | 'liquor' | 'beach-shop' {
+  // Check shop tags first
+  if (shop) {
+    switch (shop) {
+      case 'supermarket':
+        return 'grocery';
+      case 'alcohol':
+      case 'beverages':
+      case 'wine':
+        return 'liquor';
+      case 'sports':
+      case 'beach':
+      case 'surf':
+        return 'beach-shop';
+      case 'convenience':
+        return 'convenience';
+      default:
+        return 'convenience';
+    }
   }
+  
+  // Check amenity tags
+  if (amenity) {
+    switch (amenity) {
+      case 'restaurant':
+      case 'fast_food':
+      case 'food_court':
+        return 'restaurant';
+      case 'cafe':
+      case 'ice_cream':
+        return 'cafe';
+      case 'bar':
+      case 'pub':
+        return 'bar';
+      default:
+        return 'restaurant';
+    }
+  }
+  
+  return 'convenience';
 }
 
 /**
